@@ -4,8 +4,10 @@ import ExerciseListItem from '../components/ExerciseListItem';
 import {useQuery, useInfiniteQuery} from '@tanstack/react-query';
 import { request,gql } from 'graphql-request';
 import client from '../graphqlClient';
-import { Redirect } from 'expo-router';
+import { Redirect, Stack } from 'expo-router';
 import { useAuth } from '../providers/AuthContext';
+import { useState } from 'react';
+import { useDebounce } from '@uidotdev/usehooks';
 const url = 'https://sitiomarino.us-east-a.ibm.stepzen.net/api/chest-exercises/graphql';
 const exercisesQuery = gql`
 query exercises($muscle: String, $name: String, $offset: Int) {
@@ -18,11 +20,15 @@ query exercises($muscle: String, $name: String, $offset: Int) {
 `;
 
 export default function ExercisesScreen() {
+  const [search, setSearch] = useState('');
+  const debouncedSearchTerm = useDebounce(search.trim(), 500);
+
   const {data, isLoading, error, fetchNextPage, isFetchingNextPage} = useInfiniteQuery({
-    queryKey: ['exercises'],
-    queryFn: ({ pageParam }) => client.request(exercisesQuery, {offset: pageParam}),
+    queryKey: ['exercises', debouncedSearchTerm],
+    queryFn: ({ pageParam }) => client.request(exercisesQuery, {offset: pageParam, name: debouncedSearchTerm}),
     initialPageParam: 0,
     getNextPageParam: (lastPage, pages) => pages.length * 10,
+
     });
 
     const { username } = useAuth();
@@ -47,6 +53,12 @@ export default function ExercisesScreen() {
   return (
     <View style={styles.container}>
       <Text style = {{color: 'white'}}>{username}</Text>
+      <Stack.Screen options={{headerSearchBarOptions: {
+        placeholder: "Search for Exercises..",
+        onChangeText: (event) => setSearch(event.nativeEvent.text),
+      },
+    }}
+    />
       <FlatList 
         data = {exercises}
         contentContainerStyle={{gap: 5}}
