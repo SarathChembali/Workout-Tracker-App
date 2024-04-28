@@ -66,6 +66,7 @@ export default function ExercisesScreen() {
         renderItem={({item})=><ExerciseListItem item = {item}/>}
         onEndReachedThreshold={1}
         onEndReached={loadMore}
+        contentInsetAdjustmentBehavior='automatic'
       />
       
       <StatusBar style = "auto" />
