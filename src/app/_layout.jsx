@@ -10,7 +10,7 @@ export default function RootLayout(){
             <AuthContextProvider>
                 <QueryClientProvider client = {client}>
                     <Stack>
-                        <Stack.Screen name='index' options={{title: 'Exercises'}}/>
+                        <Stack.Screen name="(tabs)" options= {{headerShown: false}} />
                     </Stack>
                 </QueryClientProvider>
             </AuthContextProvider>
