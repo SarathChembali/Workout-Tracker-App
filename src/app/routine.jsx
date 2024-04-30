@@ -4,12 +4,11 @@ import { Link } from 'expo-router';
 const tracker = () => {
   return (
     <View style = {styles.container}>
-      <Text style = {styles.headerText}>My Routines</Text>
-      <Link href = {`/routine`} asChild>
+      <Text style = {styles.headerText}>New Routine</Text>
+
       <Pressable style = {styles.button}>
-        <Text style = {styles.text}>+ Create New Routine</Text>
+        <Text style = {styles.text}>+ Add Exercise</Text>
       </Pressable>
-      </Link>
     </View>
   );
 };

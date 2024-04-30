@@ -1,6 +1,7 @@
 type DocumentsEntry {
   _id: String
   exercise: String
+  routineName: String
   reps: Int
   weight: Float
 }

@@ -71,9 +71,9 @@ export default function ExercisesScreen() {
   if(error){
     return <Text>Failed to fetch exercises!</Text>
   }
-  if(!username){
-    return <Redirect href= {'/auth'} />;
-  }
+  // if(!username){
+  //   return <Redirect href= {'/auth'} />;
+  // }
 
 
   const handleMuscleSelect = (muscle) => {

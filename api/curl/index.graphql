@@ -1,0 +1,24 @@
+type DocumentsEntryTwo {
+  _id: String
+  exercise: String
+  routineName: String
+}
+
+type RootTwo {
+  documents: [DocumentsEntryTwo]
+}
+
+type Query {
+  myQuery(collection: String, dataSource: String, database: String): Root
+    @rest(
+      method: POST
+      endpoint: "https://ap-south-1.aws.data.mongodb-api.com/app/data-zmqdowt/endpoint/data/v1/action/find"
+      headers: [
+        { name: "access-control-request-headers", value: "*" }
+        {
+          name: "api-key"
+          value: "ZNnr0hbZaa3cLCeK1LAlpvXKRBSbh1rVM4auvmeDhkptF5uAHlYywrZYnXA7bbqN"
+        }
+      ]
+    )
+}
