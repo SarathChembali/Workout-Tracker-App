@@ -4,7 +4,6 @@ schema
       "exercises/index.graphql"
       "mongodb/index.graphql"
       "curl-01/index.graphql"
-      "curl/index.graphql"
     ]
   ) {
   query: Query

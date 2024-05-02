@@ -34,4 +34,49 @@ type Query {
         }
       """
     )
+  routines( username: String!): Root
+    @rest(
+      method: POST
+      endpoint: "https://ap-south-1.aws.data.mongodb-api.com/app/data-zmqdowt/endpoint/data/v1/action/find"
+      headers: [
+        { name: "access-control-request-headers", value: "*" }
+        {
+          name: "api-key"
+          value: "ZNnr0hbZaa3cLCeK1LAlpvXKRBSbh1rVM4auvmeDhkptF5uAHlYywrZYnXA7bbqN"
+        }
+      ],
+      postbody: """
+        {
+          "collection": "routines",
+          "dataSource": "Cluster0",
+          "database": "workouts",
+          "filter": {
+            "username": "{{ .Get "username"}}"
+          }
+        }
+      """
+    )
+  showExercisesInRoutine(routineName: String!, username: String!): Root
+    @rest(
+      method: POST
+      endpoint: "https://ap-south-1.aws.data.mongodb-api.com/app/data-zmqdowt/endpoint/data/v1/action/find"
+      headers: [
+        { name: "access-control-request-headers", value: "*" }
+        {
+          name: "api-key"
+          value: "ZNnr0hbZaa3cLCeK1LAlpvXKRBSbh1rVM4auvmeDhkptF5uAHlYywrZYnXA7bbqN"
+        }
+      ],
+      postbody: """
+        {
+          "collection": "routines",
+          "dataSource": "Cluster0",
+          "database": "workouts",
+          "filter": {
+            "username": "{{ .Get "username"}}",
+            "routineName": "{{ .Get "routineName"}}"
+          }
+        }
+      """
+    )
 }

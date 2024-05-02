@@ -25,7 +25,6 @@ const SetsList = ({ListHeaderComponent, exerciseName}) => {
         queryKey: ['sets', exerciseName],
         queryFn: () => graphqlClient.request(setsQuery, {exercise: exerciseName, username})
     });
-
     if(isLoading){
         return <ActivityIndicator/>;
     }
