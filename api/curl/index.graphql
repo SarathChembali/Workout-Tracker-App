@@ -1,0 +1,29 @@
+type InsertExerciseResponse {
+  insertedId: String
+}
+
+input NewExercise {
+  username: String!
+  routineName: String!
+  exercise: String!
+}
+
+type Mutation {
+  insertExercise(
+    collection: String!
+    dataSource: String!
+    database: String!
+    document: NewExercise!
+  ): InsertExerciseResponse
+    @rest(
+      method: POST
+      endpoint: "https://ap-south-1.aws.data.mongodb-api.com/app/data-zmqdowt/endpoint/data/v1/action/insertOne"
+      headers: [
+        { name: "access-control-request-headers", value: "*" }
+        {
+          name: "api-key"
+          value: "ZNnr0hbZaa3cLCeK1LAlpvXKRBSbh1rVM4auvmeDhkptF5uAHlYywrZYnXA7bbqN"
+        }
+      ]
+    )
+}

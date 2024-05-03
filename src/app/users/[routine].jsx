@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../providers/AuthContext';
 import ShowExercises from '../../components/ShowExercisesInRoutine';
 import { useLocalSearchParams, Stack } from "expo-router";
+import NewExerciseInput from '../../components/NewExerciseInput';
 const exercisesInRoutineQuery = gql`
 query showExercisesInRoutine($routineName: String!, $username: String!) {
   showExercisesInRoutine(routineName: $routineName, username: $username) {
@@ -21,7 +22,6 @@ query showExercisesInRoutine($routineName: String!, $username: String!) {
 const ShowRoutineExercises = () => {
   const {routine} = useLocalSearchParams();
   const {username} = useAuth();
-  console.log(routine);
   const {data, isLoading} = useQuery({
     queryKey: ['showExercisesInRoutine', routine],
     queryFn: () => graphqlClient.request(exercisesInRoutineQuery, {routineName: routine, username})
@@ -29,15 +29,14 @@ const ShowRoutineExercises = () => {
   if(isLoading){
     return <ActivityIndicator/>;
   }
-  console.log(data.showExercisesInRoutine.documents);
   return (
     <View style = {styles.container}>
       <Stack.Screen options={{title: routine}}/>
-      <Text style = {styles.headerText}>New Routine</Text>
+      <Text style = {styles.headerText}>Exercises in {routine}</Text>
 
-      <Pressable style = {styles.button}>
-        <Text style = {styles.text}>+ Add Exercise</Text>
-      </Pressable>
+      <View style = {styles.button}>
+        <NewExerciseInput routineName={routine}/>
+      </View>
       <FlatList 
         data = {data.showExercisesInRoutine.documents}
         contentContainerStyle = {{gap: 5}}
