@@ -2,11 +2,27 @@ type InsertExerciseResponse {
   insertedId: String
 }
 
+type UpdateExerciseResponse {
+  matchedCount: Int
+  modifiedCount: Int
+}
+
+input InputFilter {
+  username: String!
+  routineName: String!
+  exercise: String
+}
+input InputUpdate {
+  exercise: String
+}
+
 input NewExercise {
   username: String!
   routineName: String!
-  exercise: String!
+  exercise: String
 }
+
+
 
 type Mutation {
   insertExercise(
@@ -25,5 +41,34 @@ type Mutation {
           value: "ZNnr0hbZaa3cLCeK1LAlpvXKRBSbh1rVM4auvmeDhkptF5uAHlYywrZYnXA7bbqN"
         }
       ]
+    )
+  updateExercise(username: String!, routineName: String!, exercise: String!, updatedExercise: String!): UpdateExerciseResponse
+    @rest(
+      method: POST
+      endpoint: "https://ap-south-1.aws.data.mongodb-api.com/app/data-zmqdowt/endpoint/data/v1/action/updateOne"
+      headers: [
+        { name: "access-control-request-headers", value: "*" }
+        {
+          name: "api-key"
+          value: "ZNnr0hbZaa3cLCeK1LAlpvXKRBSbh1rVM4auvmeDhkptF5uAHlYywrZYnXA7bbqN"
+        }
+      ],
+      postbody: """
+        {
+          "collection": "routines",
+          "dataSource": "Cluster0",
+          "database": "workouts",
+          "filter": {
+            "username": "{{ .Get "username"}}",
+            "routineName": "{{ .Get "routineName"}}", 
+            "exercise": "{{ .Get "exercise"}}"
+          },
+          "update":{
+            "$set":{
+                    "exercise": "{{ .Get "updatedExercise"}}"
+                  }
+          }
+        }
+      """
     )
 }

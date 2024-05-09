@@ -19,6 +19,7 @@ query showExercisesInRoutine($routineName: String!, $username: String!) {
 }
 `
 
+
 const ShowRoutineExercises = () => {
   const {routine} = useLocalSearchParams();
   const {username} = useAuth();

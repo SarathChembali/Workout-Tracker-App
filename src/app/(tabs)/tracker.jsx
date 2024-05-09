@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import { View, Text, StyleSheet, Pressable, FlatList, ActivityIndicator } from 'react-native';
 import { Link } from 'expo-router';
 import { gql } from 'graphql-request';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import graphqlClient from "../../graphqlClient";
 import { useAuth } from '../../providers/AuthContext';
 import RoutineListItem from '../../components/RoutineListItem';
@@ -21,11 +21,12 @@ query routines($username: String!) {
 
 const tracker = () => {
   const {username} = useAuth();
+  const queryClient = useQueryClient();
   const {data, isLoading} = useQuery({
     queryKey: ['routines'],
     queryFn: () => graphqlClient.request(routineQuery, {username})
   });
-
+  const [routineCount, setRoutineCount] = useState(1);
   const [uniqueRoutineNames, setUniqueRoutineNames] = useState([]);
   useEffect(() => {
     if (!isLoading && data) {
@@ -33,16 +34,25 @@ const tracker = () => {
       setUniqueRoutineNames(uniqueNames);
     }
   }, [data, isLoading]);
-
+  const handleCreateNewRoutine = async () => {
+    await queryClient.invalidateQueries('routines');
+    const updatedData = queryClient.getQueryData('routines');
+    console.log(updatedData);
+    setRoutineCount(count => count + 1);
+  };
 
   if(isLoading){
     return <ActivityIndicator/>
   }
+  const newRoutine = `NewRoutine${routineCount}`;
   return (
     <View style = {styles.container}>
       <Text style = {styles.headerText}>My Routines</Text>
+      <Link href = {`/users/${newRoutine}`} asChild>
+        <Pressable style = {styles.button} onPress={handleCreateNewRoutine}>
         <Text style = {styles.text}>+ Create New Routine</Text>
-      
+        </Pressable>
+      </Link>
       <FlatList 
         data = {uniqueRoutineNames}
         contentContainerStyle = {{gap: 5}}
