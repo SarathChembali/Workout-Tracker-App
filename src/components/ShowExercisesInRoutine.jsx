@@ -1,11 +1,11 @@
-import {View, Text, StyleSheet, TextInput, TouchableOpacity, Button} from 'react-native';
+import {View, Text, StyleSheet, TextInput, TouchableOpacity, Button, Alert} from 'react-native';
 import React from 'react';
 import graphqlClient from '../graphqlClient';
 import { gql } from "graphql-request";
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../providers/AuthContext';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const EditExerciseInRoutine = gql`
 mutation EditMutation($exercise: String!, $routineName: String!, $username: String!, $updatedExercise: String!) {
@@ -20,33 +20,68 @@ mutation EditMutation($exercise: String!, $routineName: String!, $username: Stri
   }
 }
 `
+const deleteExerciseInRoutine = gql`
+mutation deleteExercise($exercise: String!, $routineName: String!, $username: String!) {
+    deleteExercise(
+      exercise: $exercise
+      routineName: $routineName
+      username: $username
+    ) {
+      deletedCount
+    }
+  }
+`
 
-const ShowExercises = ({ routine }) =>{
+
+
+const ShowExercises = ({ routine, handleRefresh }) =>{
     const [exercise, newExercise] = useState(routine.exercise);
     const {username} = useAuth();
     const routineName = routine.routineName;
     const queryClient = useQueryClient();
     const [isEditing, setIsEditing] = useState(false);
-    const originalExercise = routine.exercise;
-    const { mutate, error, isError, isPending } = useMutation({
+    
+    
+
+    const { mutate: updateMutation, error: updateError, isError: isUpdateError, isPending: isUpdatePending } = useMutation({
         mutationFn: ({exercise, routineName, username, updatedExercise}) => graphqlClient.request(EditExerciseInRoutine, {exercise, routineName, username, updatedExercise}),
         onSuccess: () => {
-            newExercise(updatedExercise);
+            
             queryClient.invalidateQueries({ queryKey: ['showExercisesInRoutine', routine]});
+            newExercise(updatedExercise);
+            
         }
     })
+    const { mutate: deleteMutation, error: deleteError, isError: isDeleteError, isPending: isDeletePending } = useMutation({
+        mutationFn: ({exercise, routineName, username}) => graphqlClient.request(deleteExerciseInRoutine, {exercise, routineName, username}),
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ['showExercisesInRoutine', routine]});
 
+        }
+    })
     const handleUpdate = () => {
             console.log(exercise);
             console.log(routine.exercise)
-            mutate({
+            updateMutation({
                 exercise: routine.exercise,
                 routineName: routineName,
                 username: username,
                 updatedExercise: exercise
             });
-        console.log(error);
+            console.log(updateError);
         setIsEditing(false);
+    }
+    const handleDelete = async () => {
+        try {
+            await deleteMutation({
+                exercise: routine.exercise,
+                routineName: routineName,
+                username: username
+            });
+            handleRefresh();
+        } catch (error) {
+            console.error('Error deleting exercise:', error);
+        }
     }
     return (
         <View style = {styles.container}>
@@ -67,9 +102,14 @@ const ShowExercises = ({ routine }) =>{
                 {isEditing ? "Cancel" : "Update"}
                 </Text>
             </TouchableOpacity>
-            {isEditing && (
+
+            {isEditing ? (
                 <TouchableOpacity onPress={handleUpdate}>
                     <Text style={styles.button}>Save</Text>
+                </TouchableOpacity>
+            ):(
+                <TouchableOpacity onPress={handleDelete}>
+                    <Text style={styles.button}>{isDeletePending ? "Deleting...": "Delete"}</Text>
                 </TouchableOpacity>
             )}
             </View>

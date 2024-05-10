@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, Pressable, ActivityIndicator, FlatList } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator, FlatList, Alert } from 'react-native';
 import { Link } from 'expo-router';
 import graphqlClient from '../../graphqlClient';
 import { gql } from "graphql-request";
@@ -23,11 +23,25 @@ query showExercisesInRoutine($routineName: String!, $username: String!) {
 const ShowRoutineExercises = () => {
   const {routine} = useLocalSearchParams();
   const {username} = useAuth();
-  const {data, isLoading} = useQuery({
+  const {data, isLoading, refetch} = useQuery({
     queryKey: ['showExercisesInRoutine', routine],
     queryFn: () => graphqlClient.request(exercisesInRoutineQuery, {routineName: routine, username})
   });
-  if(isLoading){
+  const [refreshing, setRefreshing] = useState(false);
+  console.log(data);
+
+  const handleRefreshFlatList = () => {
+    setRefreshing(true);
+    refetch();
+    setRefreshing(false);
+  }
+  const handleRefresh = () => {
+    refetch();
+  }
+
+
+
+if(isLoading){
     return <ActivityIndicator/>;
   }
   return (
@@ -41,7 +55,10 @@ const ShowRoutineExercises = () => {
       <FlatList 
         data = {data.showExercisesInRoutine.documents}
         contentContainerStyle = {{gap: 5}}
-        renderItem={({item}) => <ShowExercises routine = {item}/>}
+        extraData={data.showExercisesInRoutine.documents}
+        renderItem={({item}) => <ShowExercises routine = {item} handleRefresh = {handleRefresh}/>}
+        refreshing={refreshing}
+        onRefresh={handleRefreshFlatList}
       />
 
     </View>
